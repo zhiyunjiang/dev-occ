@@ -9,7 +9,7 @@ class Stater():
     self.base = Path(base)
     self.output_dir = Path('./outdir')
     self.output_dir.mkdir_p()
-    self.keys  = ['dev','details']
+    self.keys  = ['dev_no','dev','details','owner']
 
     pass
   def __concat__(self,first_line=False):
@@ -21,7 +21,7 @@ class Stater():
       csv_item = pd.read_csv(file)
       # for idx,row in csv_item.iterrows():
       #   pass
-
+      csv_item.loc[:, 'owner'] = file.stem
       csv_list .append(csv_item)
 
     df_total = pd.concat(csv_list,ignore_index=True)
@@ -43,6 +43,7 @@ class Stater():
 
     total = self.__concat__()
     total.sort_values(by = "dev",inplace=True)
+    total = total[self.keys]
     if isPrint:
       for idx, row in total.iterrows():
         print("{}\n{} {}".format(idx, row[self.keys[0]],row[self.keys[1]]))
