@@ -9,9 +9,13 @@ class Stater():
     self.base = Path(base)
     self.output_dir = Path('./outdir')
     self.output_dir.mkdir_p()
+    self.keys  = ['dev','details']
+
     pass
   def __concat__(self,first_line=False):
     files = self.base.files('*.csv')
+    files.sort()
+    print("设备统计共计{}人".format(len(files)-1))
     csv_list = []
     for file in files:
       csv_item = pd.read_csv(file)
@@ -20,12 +24,13 @@ class Stater():
 
       csv_list .append(csv_item)
 
-    df_total = pd.concat(csv_list)
-    print('ok')
+    df_total = pd.concat(csv_list,ignore_index=True)
+    return df_total
 
 
 
-  def dev_stat(self):
+  def dev_stat(self,isPrint=False):
+    cols = ['dev','details']
     dev = ['mm','hdd','ssd','case','sc','gc']
 
     mm_dict = {'内存'}
@@ -37,6 +42,12 @@ class Stater():
 
 
     total = self.__concat__()
+    total.sort_values(by = "dev",inplace=True)
+    if isPrint:
+      for idx, row in total.iterrows():
+        print("{}\n{} {}".format(idx, row[self.keys[0]],row[self.keys[1]]))
+    total.to_csv(self.output_dir/"total.csv",index=False)
+    print("汇总:{}".format(self.output_dir/"total.csv"))
 
 
 
@@ -46,7 +57,6 @@ class Stater():
 
 
 def main():
-  print('????')
   stater = Stater(base='./CSVs')
   stater.dev_stat()
 
